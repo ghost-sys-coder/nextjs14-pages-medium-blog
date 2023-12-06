@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+    * {
+        @apply transition-all duration-300;
+    }
+
+    body {
+        @apply bg-light-1 dark:bg-dark-1;
+    }
+
+    main {
+        @apply max-w-[1440px] mx-auto min-h-screen;
+    }
+}
+
+@layer utilities {
+    .title {
+        @apply text-2xl text-dark-1 dark:text-light-1 font-bold md:text-3xl pb-4;
+    }
+
+    .login-btns {
+        @apply flex items-center gap-2 shadow-lg rounded-md bg-primary-600 w-full mb-4 py-2 px-4 text-white font-semibold text-[1rem] cursor-pointer;
+
+        svg {
+            @apply text-3xl;
+        }
+
+        &:hover {
+            @apply bg-primary-500;
+        }
+    }
+
+    .social--links {
+        @apply hidden lg:flex gap-5 items-center justify-center;
+
+        a {
+            @apply text-primary-500 text-2xl;
+        }
+    }
+
+    .navbar {
+        @apply hidden md:flex gap-4 items-center;
+
+        a {
+            @apply text-dark-4 font-semibold dark:text-white text-xl hover:text-primary-500 hover:dark:text-primary-500;
+        }
+
+        div {
+            svg {
+                @apply dark:text-white text-dark-4 text-xl cursor-pointer;
+            }
+        }
+    }
+
+    .mobile-nav {
+        @apply flex gap-4 justify-start items-start flex-col;
+
+        a {
+            @apply font-semibold capitalize text-xl bg-primary-500 w-full rounded-md py-2 px-2 text-light-1;
+        }
+    }
+
+    .mobile_social-links{
+        @apply flex gap-5 items-center justify-center;
+
+        a {
+            @apply text-primary-500 text-3xl;
+        }
+    }
+}
+
+div.ql-container.ql-snow {
+    @apply border-none outline-none w-full;
+}
+
+div.ql-toolbar.ql-snow {
+    @apply border-none outline-none;
+}
+
+div.ql-editor.ql-blank{
+    @apply min-h-[200px] placeholder:text-red;
+
+    &::before {
+        @apply text-dark-3 dark:text-light-2;
+    }
+}
+
+.description {
+    @apply flex flex-col text-sm font-medium text-neutral-600 dark:text-light-2 max-lg:text-xl max-sm:text-sm;
+}
+
+
+.edit--page {
+    @apply min-h-screen;
+
+    form {
+        @apply shadow-lg rounded-md p-2 max-w-[1000px] mx-auto;
+
+        .input-container {
+            @apply w-full mb-4;
+
+            label{
+                @apply block text-dark-3 dark:text-light-2 pb-2 font-semibold text-xl;
+            }
+
+            input {
+                @apply w-full h-[40px] outline-none border-none rounded-sm pl-2 font-medium focus-within:bg-primary-500 focus-within:text-light-1;
+            }
+        }
+    }
+}
