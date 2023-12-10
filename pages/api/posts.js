@@ -44,8 +44,12 @@ export default async function handler(req, res) {
         const pageSize = 2;
 
         try {
-            const posts = await Post.find({}).skip((currentPage - 1) * 2).limit(pageSize);
-            res.status(200).json(posts);
+            const posts = await Post.find({}).skip((currentPage - 1) * 2).limit(pageSize).sort({ createdAt: -1 });
+            const postCount = await Post.countDocuments({});
+            res.status(200).json({
+                posts,
+                postCount
+            });
         } catch (error) {
             console.log(error);
             return res.status(500).json({error: error.message})

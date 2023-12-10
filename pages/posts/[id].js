@@ -3,42 +3,47 @@ import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
 import axios from 'axios'
-import { format } from 'date-fns'
 import { useSession } from 'next-auth/react'
 import { Loader2 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { errorOptions, successOptions } from '@/constants'
+import { PopularPosts } from '@/components'
 
 
-export async function getStaticPaths() {
-  const { data } = await axios.get('http://localhost:3000/api/posts');
-
-  const paths = await data.map((post) => ({
-    params: { id: post._id.toString() }
-  }));
-
-  return {
-    paths, fallback: false
-  }
-}
-
-export async function getStaticProps({ params }) {
-  const response = await axios.get(`http://localhost:3000/api/posts/${params.id}`);
-  const post = await response.data;
-
-  return {
-    props: {post}
-  }
-}
-
-const Post = ({post}) => {
+const Post = () => {
   const { query } = useRouter();
+  const [post, setPost] = useState(null)
   const [value, setValue] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isCommmenting, setIsCommmenting] = useState(false);
   const [comments, setComments] = useState([]);
+  const [views, setViews] = useState(0)
   const { data: session, status } = useSession();
 
+  useEffect(() => {
+    axios.post(`/api/posts/${query.id}`)
+      .then(({ data }) => {
+        setViews(data.views)
+      })
+    .catch((error)=> console.log(error))
+  }, [query.id])
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true)
+      try {
+        const { data } = await axios.get(`/api/posts/${query.id}`);
+        setPost(data)
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false)
+      }
+    };
+
+    fetchPost();
+  }, [query.id])
 
   const getComments = useCallback(async() => {
     try {
@@ -56,7 +61,7 @@ const Post = ({post}) => {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setIsCommmenting(true)
     try {
       const { data, status } = await axios.post('/api/comments', {
         comment: {
@@ -77,13 +82,13 @@ const Post = ({post}) => {
       console.log(error);
       toast.error('Failed to add comment', errorOptions);
     } finally {
-      setLoading(false);
+      setIsCommmenting(false);
     }
   }
 
   if (loading) {
     return (
-      <div className='h-full flex justify-center items-center'>
+      <div className='min-h-screen flex justify-center items-center'>
         <Loader2 size={50} className='text-dark-3 dark:text-primary-500 font-bold' />
       </div>
     )
@@ -91,39 +96,43 @@ const Post = ({post}) => {
 
   return (
     <div className='min-h-screen'>
-      <div className="flex flex-row-reverse gap-4 h-[300px] justify-between">
-        <div className="flex-1">
+      <div className="min-h-[300px] flex flex-col lg:flex-row-reverse gap-4 justify-between">
+        <div className="lg:w-2/3 w-full">
           <Image
-            src={post.imageUrl}
+            src={post?.imageUrl}
             alt='post image'
             width={300}
             height={200}
-            className='rounded-md shadow-md object-cover h-full w-full'
+            className='rounded-md shadow-md object-cover h-[200px] lg:h-[300px] w-full'
           />
         </div>
         <div className="flex-1 flex flex-col gap-8 items-start justify-center">
-          <h1 className='text-dark-3 dark:text-light-2 font-bold text-2xl md:text-3xl'>{post.title}</h1>
+          <h1 className='text-dark-3 dark:text-light-2 font-bold text-xl md:text-2xl lg:text-3xl'>{post?.title}</h1>
           <div className='flex gap-2'>
             <Image
-              src={post.creator?.image}
+              src={post?.creator?.image}
               alt='profile'
               width={50}
               height={50}
               className='rounded-full object-cover'
             />
             <div className='flexflex-col gap-1 items-start justify-center'>
-              <p className='text-xl font-bold text-neutral-800 dark:text-light-2'>{post.creator?.name}</p>
-              <span className='text-sm font-semibold text-neutral-800 dark:text-light-2'>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
+              <p className='text-xl font-bold text-neutral-800 dark:text-light-2'>{post?.creator?.name}</p>
+              <span className='text-sm font-semibold text-neutral-800 dark:text-light-2'>{post?.createdAt.split("T")[0]}</span>
             </div>
+          </div>
+          <div className='flex items-center justify-start gap-2'>
+            <p className='bg-gray-800 text-white rounded-sm shadow-md py-1 px-2 cursor-pointer'>This post has been viewed</p>
+            <p className='font-semibold text-primary-600'>{views} times</p>
           </div>
         </div>
       </div>
 
-      <div className='flex gap-4 justify-between my-10 min-h-full'>
-        <div className='w-2/3'>
+      <div className='flex md:flex-row flex-col gap-5 md:gap-20 justify-between my-10 min-h-full'>
+        <div className='lg:w-2/3 md:w-1/2 w-full'>
           <div
             className='text-dark-3 font-medium dark:text-light-2'
-            dangerouslySetInnerHTML={{__html: post.description}}
+            dangerouslySetInnerHTML={{__html: post?.description}}
           />
           <div className='my-6 flex flex-col gap-3'>
             <h1 className='font-medium text-dark-3 dark:text-neutral-600 text-3xl'>Comments</h1>
@@ -140,7 +149,7 @@ const Post = ({post}) => {
                 <button className='flex gap-2 items-center justify-center bg-dark-3 dark:bg-primary-500 rounded-md cursor-pointer text-white font-semibold py-2 px-4 text-xl max-sm:w-full mt-2 hover:bg-primary-600'
                   onClick={handleAddComment}
                 >
-                  {loading ? (
+                  {isCommmenting ? (
                     <>
                       <Loader2 size={25} />
                       <span>Adding Comment</span>
@@ -167,7 +176,7 @@ const Post = ({post}) => {
                   />
                   <div className="flex flex-col gap-[1px] items-start justify-start">
                     <p className='font-medium text-sm text-dark-3 dark:text-light-2'>{comment?.name}</p>
-                    <span className='font-medium text-[10px] text-dark-3 dark:text-light-2'>{format(new Date(createdAt), 'yyyy-MM-dd')}</span>
+                    <span className='font-medium text-[10px] text-dark-3 dark:text-light-2'>{createdAt.split("T")[0]}</span>
                   </div>
                 </div>
                 <div>
@@ -183,8 +192,8 @@ const Post = ({post}) => {
           </div>
 
         </div>
-        <div className='flex-1 bg-black'>
-          
+        <div className='flex-1'>
+          <PopularPosts />
         </div>
       </div>
       <Toaster />

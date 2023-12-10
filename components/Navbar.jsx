@@ -56,7 +56,6 @@ const Navbar = ({open, setOpen}) => {
         {status === "authenticated" ? (
           <>
             <Link href={"/write"}>Write</Link>
-            <Link href={"/profile"}>{data.user.name?.split(" ")[0]}</Link>
           </>
         ) : (
           <Link href={"/login"}>Login</Link>

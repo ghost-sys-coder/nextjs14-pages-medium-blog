@@ -33,7 +33,7 @@ export const AuthOptions = {
             if (account.provider === 'google') {
                 try {
 
-                    const userExists = await User.findOne({ provider });
+                    const userExists = await User.findOne({ email });
 
                     if (!userExists) {
                         const { data, status } = await axios.post('http://localhost:3000/api/user', {
@@ -50,7 +50,7 @@ export const AuthOptions = {
                 }
             } else if (account.provider === 'github') {
                 try {
-                    const userExists = await User.findOne({ provider });
+                    const userExists = await User.findOne({ email });
 
                     if (!userExists) {
                         const { data, status } = await axios.post('http://localhost:3000/api/user', {

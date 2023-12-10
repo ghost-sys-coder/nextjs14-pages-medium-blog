@@ -3,22 +3,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const PostCard = ({ post }) => {
   const { data } = useSession();
 
+  
 
-  return (
-    <div className="flex gap-4 mt-4">
+return (
+    <div className="flex gap-4 mt-4 flex-col sm:flex-row">
       <Image
         src={post?.imageUrl}
         alt={post?.title}
         width={250}
         height={250}
-        className="rounded-md object-cover"
+        className="rounded-md object-cover overflow-hidden max-sm:w-full"
       />
-      <div className="flex flex-col justify-center items-start gap-2 py-6">
+      <div className="flex flex-col justify-center items-start gap-2 py-6 flex-1">
         <div className="flex items-center gap-2 mb-3">
           <p className="text-neutral-400 font-medium dark:text-light-3">
             {format(new Date(post?.createdAt), "yyyy-MM-dd")}
@@ -28,9 +29,12 @@ const PostCard = ({ post }) => {
           <div className="bg-red h-[2px] w-[2px] rounded-full"></div>
           {post?.creator?.email === data?.user?.email && (
             <Link className="font-semibold text-dark-3 dark:text-light-2" href={`/edit/${post?._id}`}>
-              <FaEdit size={30} />
+              <FaEdit size={25} />
             </Link>
-          )}
+        )}
+        {post?.creator?.email === data?.user?.email && (
+          <FaTrash size={25} className="font-bold text-dark-3 dark:text-light-2" />
+        )}
         </div>
         <h1 className="font-semibold text-xl text-dark-3 dark:text-light-2 pb-2">
           {post?.title}

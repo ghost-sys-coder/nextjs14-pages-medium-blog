@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { Loader } from "lucide-react";
@@ -6,57 +6,48 @@ import toast, { Toaster } from "react-hot-toast";
 import { ImageUpdate, UpdateDescription } from "@/components";
 import { errorOptions, successOptions } from "@/constants";
 
-export async function getStaticPaths() {
-  const { data } = await axios.get("http://localhost:3000/api/posts");
 
-  const paths = await data.map((post) => ({
-    params: { id: post._id.toString() },
-  }));
-
-  return { paths, fallback: false };
-}
-
-export async function getStaticProps({ params }) {
-  const response = await axios.get(
-    `http://localhost:3000/api/posts/${params.id}`
-  );
-  const post = await response.data;
-
-  return {
-    props: { post },
-  };
-}
-
-const EditPost = ({ post }) => {
+const EditPost = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: post.title || "",
-    description: post.description || "",
-    imageUrl: post.imageUrl || "",
-    tags: post.tags || "",
-    category: post.category || "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((values) => ({
-      ...values,
-      [name]: value,
-    }));
-  };
+  const [postId, setPostId] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [tags, setTags] = useState('');
+  const [category, setCategory] = useState('')
+  
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true)
+      try {
+        const { data } = await axios.get(`/api/posts/${router.query.id}`);
+        setPostId(data?._id);
+        setTitle(data?.title);
+        setDescription(data?.description);
+        setImageUrl(data?.imageUrl);
+        setTags(data?.tags);
+        setCategory(data?.category)
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [router.query.id])
+  
 
   const handlePublish = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data, status } = await axios.put(`/api/posts/${post._id}`, {
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
-        tags: formData.tags,
-        imageUrl: formData.imageUrl,
+      const { data, status } = await axios.put(`/api/posts/${postId}`, {
+        title,
+        description,
+        category,
+        tags,
+        imageUrl
       });
       console.log(data);
       toast.success("Your post has been updated!", successOptions);
@@ -87,8 +78,8 @@ const EditPost = ({ post }) => {
             id="title"
             name="title"
             placeholder="Post title...."
-            value={formData.title}
-            onChange={handleChange}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
           />
         </div>
         <div className="my-8">
@@ -99,14 +90,17 @@ const EditPost = ({ post }) => {
             Image:
           </label>
           <ImageUpdate
-            formData={formData}
-            setFormData={setFormData}
-            post={post}
+            imageUrl={imageUrl}
+            setImageUrl={setImageUrl}
+            postId={postId}
           />
         </div>
         <div className="input-container">
           <label htmlFor="description">Description</label>
-          <UpdateDescription formData={formData} setFormData={setFormData} />
+          <UpdateDescription
+            setDescription={setDescription}
+            description={description}
+          />
         </div>
         <div className="input-container">
           <label htmlFor="tags">Tags:</label>
@@ -118,8 +112,8 @@ const EditPost = ({ post }) => {
             id="tags"
             name="tags"
             placeholder="Add tags..."
-            value={formData.tags}
-            onChange={handleChange}
+            value={tags}
+            onChange={e => setTags(e.target.value)}
           />
         </div>
         <div className="input-container">

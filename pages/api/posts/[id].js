@@ -72,4 +72,28 @@ export default async function handler(req, res) {
       }
 
   }
+
+
+  /** update views entry */
+  if (req.method === 'POST') {
+    const session = await getServerSession(req, res, auth0ptions);
+    console.log({ session });
+
+    if (!session) {
+      return res.status(500).json({message: 'User not authenticated for this action!'})
+    }
+
+    try {
+      const { id } = req.query;
+      const post = await Post.findOneAndUpdate(
+        {_id: id},
+        { $inc: { views: 1 } },
+        { new: true }
+      );
+      return res.status(200).json({views: post.views})
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({error: error.message})
+    }
+  }
 }

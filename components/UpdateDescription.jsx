@@ -7,20 +7,13 @@ import "react-quill/dist/quill.snow.css";
 
 const ReactQuill = dynamic(import("react-quill"), { ssr: false });
 
-const UpdateDescription = ({formData, setFormData}) => {
-    const [value, setValue] = useState(formData.description);
-    
-    useEffect(() => {
-        setFormData((values) => ({
-            ...values,
-            description: value
-        }))
-    }, [setFormData, value])
+const UpdateDescription = ({setDescription, description}) => {
+ 
   return (
     <ReactQuill
       theme="snow"
-      value={value}
-      onChange={setValue}
+      value={description}
+      onChange={setDescription}
       formats={formats}
       modules={modules}
       placeholder="Add post Description..."

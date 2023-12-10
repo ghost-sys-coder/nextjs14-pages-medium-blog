@@ -3,7 +3,6 @@ import PostCard from "./PostCard";
 import Pagination from "./Pagination";
 
 const RecentPost = ({ posts, currentPage, setCurrentPage, postCount }) => {
-
   const handlePrevious = () => {
     setCurrentPage(currentPage - 1)
   };
@@ -11,8 +10,9 @@ const RecentPost = ({ posts, currentPage, setCurrentPage, postCount }) => {
   const handleNext = () => {
     setCurrentPage(currentPage + 1)
   }
+
   return (
-    <div className="flex flex-col gap-4 flex-1">
+    <div className="flex flex-col gap-4 w-full lg:w-2/3">
       <h1 className="font-bold text-2xl text-dark-3 dark:text-light-2">
         Recent Posts
       </h1>

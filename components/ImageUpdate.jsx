@@ -8,18 +8,17 @@ import axios from 'axios';
 import { storage } from "@/utils/firebase";
 import { errorOptions, successOptions } from "@/constants";
 
-const ImageUpdate = ({ formData, setFormData, post }) => {
+const ImageUpdate = ({ setImageUrl, imageUrl, postId }) => {
   const [file, setFile] = useState("");
-    const [media, setMedia] = useState(formData.imageUrl || '');
     
   const deleteImageFromFirebase = async () => {
     try {
-      const { status } = await axios.patch(`/api/posts/${post._id}`, {
-        imageUrl: media
+      const { status } = await axios.patch(`/api/posts/${postId}`, {
+        imageUrl
       });
       if (status === 200) {
         toast.success('Image deleted!', successOptions);
-        setMedia('')
+        setImageUrl('')
       }
     } catch (error) {
       console.log(error);
@@ -81,11 +80,7 @@ const ImageUpdate = ({ formData, setFormData, post }) => {
                       borderRadius: "10px",
                     },
                   });
-                    setMedia(downloadURL);
-                    setFormData((values) => ({
-                        ...values,
-                        imageUrl: downloadURL
-                    }))
+                    setImageUrl(downloadURL)
                 });
               }
             );
@@ -93,9 +88,7 @@ const ImageUpdate = ({ formData, setFormData, post }) => {
       
           file && onUpload();
 
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [file, setFormData])
+    }, [file, setImageUrl])
 
   return (
     <>
@@ -113,9 +106,9 @@ const ImageUpdate = ({ formData, setFormData, post }) => {
           style={{ display: "none" }}
         />
       </label>
-      {media && (
+      {imageUrl && (
         <button
-        disabled={media === ''}
+        disabled={imageUrl === ''}
         type="button"
         className="bg-dark-1 dark:bg-light-2 font-semibold text-light-2 dark:text-dark-3 rounded-md cursor-pointer py-1 px-4 inline-flex items-center justify-between gap-2 ml-2"
         onClick={deleteImageFromFirebase}
@@ -124,9 +117,9 @@ const ImageUpdate = ({ formData, setFormData, post }) => {
         <span className="dark:text-dark-3 text-light-2">Delete Image!</span>
       </button>
       )}
-      {media && (
+      {imageUrl && (
         <Image
-        src={media}
+        src={imageUrl}
         alt="image"
         width={300}
         height={250}
