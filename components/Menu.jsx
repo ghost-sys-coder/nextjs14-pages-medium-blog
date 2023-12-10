@@ -19,13 +19,14 @@ const Menu = ({open, setOpen}) => {
         <FaTimes size={35} className="text-dark-1 dark:text-light-1" />
       </div>
       <div className="flex justify-between items-center">
-        <Link className="text-xl text-neutral-500 font-semibold" href={"/"}>
+        <Link onClick={()=> setOpen(false)} className="text-2xl text-gray-700 font-bold underline" href={"/"}>
           devBlog
         </Link>
         <ThemeToggle />
       </div>
       {status === "authenticated" ? (
         <nav className="mobile-nav">
+          <Link onClick={()=> setOpen(false)} href={"/"}>Home</Link>
           <Link onClick={()=> setOpen(false)} href={"/profile"}>{data?.user?.name}</Link>
           <Link onClick={()=> setOpen(false)} href={"/write"}>write</Link>
           <div className="flex gap-2 items-center w-full bg-primary-500 py-2 rounded-md cursor-pointer">
