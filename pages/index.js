@@ -8,28 +8,29 @@ import { Loader } from 'lucide-react';
 import { errorOptions, successOptions } from '@/constants';
 
 
-export async function getServerSideProps(){
-  const response = await axios.get('http://localhost:3000/api/post');
-  
-  const category = await axios.get('http://localhost:3000/api/categories');
-
-  const postDoc = await response.data;
-  const categories = await category.data;
-
-  return {
-    props: { categories, postDoc }
-  }
-}
-
-
 const inter = Inter({ subsets: ['latin'] });
 
-export default function Home({ categories, postDoc }) {
+export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [postCount, setPostCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  useEffect(()=> {
+    const fetchCategories = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get('/api/categories');
+        setCategories(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    };
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -60,7 +61,7 @@ export default function Home({ categories, postDoc }) {
 
   return (
     <main className={inter.className}>
-      <Hero posts={postDoc} />
+      <Hero posts={posts} />
       <Categories categories={categories} />
       <div className="flex gap-10 justify-between lg:flex-row flex-col">
         <RecentPost

@@ -8,18 +8,10 @@ import { errorOptions, successOptions } from "@/constants";
 
 
 
-export async function getServerSideProps() {
-  const response = await fetch('http://localhost:3000/api/categories');
-
-  const categories = await response.json();
-  return {
-    props: { categories }
-  }
-}
-
-export default function Write({ categories }) {
+export default function Write() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [details, setDetails] = useState({
     title: "",
     category: "",
@@ -27,6 +19,7 @@ export default function Write({ categories }) {
     tags: "",
     imageUrl: "",
   });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +87,6 @@ export default function Write({ categories }) {
           </label>
           <DropDown
             setDetails={setDetails}
-            categories={categories}
           />
         </div>
         <div className="shadow-md rounded-md w-full mt-4">

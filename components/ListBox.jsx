@@ -1,15 +1,32 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
+import axios from 'axios';
 
-const DropDown = ({ setDetails, categories }) => {
-  console.log({categories})
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+const DropDown = ({ setDetails }) => {
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
+
+   /** fetch categories */
+   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get('/api/categories');
+        console.log('data', {data})
+        setCategories(data);
+        setSelectedCategory(data[0])
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCategories()
+  }, [])
+  
   useEffect(() => {
     setDetails((values) => ({
       ...values,
-      category: selectedCategory.title,
+      category: selectedCategory?.title,
     }));
   }, [selectedCategory, setDetails]);
 
@@ -19,7 +36,7 @@ const DropDown = ({ setDetails, categories }) => {
         <div className="relative mt-1">
           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
             <span className="block truncate text-red-700 font-bold">
-              {selectedCategory.title}
+              {selectedCategory?.title}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon

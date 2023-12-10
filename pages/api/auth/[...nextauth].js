@@ -36,7 +36,7 @@ export const AuthOptions = {
                     const userExists = await User.findOne({ email });
 
                     if (!userExists) {
-                        const { data, status } = await axios.post('http://localhost:3000/api/user', {
+                        const { data, status } = await axios.post('/api/user', {
                             email, name, image, provider
                         });
                         console.log(data);
