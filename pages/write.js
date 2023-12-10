@@ -8,10 +8,10 @@ import { errorOptions, successOptions } from "@/constants";
 
 
 
-export async function getStaticProps() {
-  const response = await axios.get('http://localhost:3000/api/categories');
+export async function getServerSideProps() {
+  const response = await fetch('http://localhost:3000/api/categories');
 
-  const categories = await response.data;
+  const categories = await response.json();
   return {
     props: { categories }
   }
